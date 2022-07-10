@@ -45,12 +45,9 @@ def main():
 
         grid.append(row)
 
-    print(len(grid), len(grid[0]))
-
     while True:
 
         if len(points) == 2 and run_algo:
-            clear_grid(grid)
             bresenham(points, grid)
             run_algo = False
 
@@ -70,7 +67,6 @@ def main():
                     
                     if len(points) == 2:
                         old_pt = points.pop(0)
-                        old_pt.on = False
                     
                     points.append(pt)
                     pt.on = True
@@ -89,7 +85,10 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-
+                elif event.key == pygame.K_c:
+                    clear_grid(grid)
+                    points = []
+        
             elif event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
@@ -111,7 +110,6 @@ def drawGrid(grid):
             pygame.draw.rect(SCREEN, color, rect)
 
 def plot_line_low(points, grid):
-    #print(points)
     pt0, pt1 = points[0], points[1]
     dx = pt1.x - pt0.x
     dy = pt1.y - pt0.y
@@ -134,7 +132,6 @@ def plot_line_low(points, grid):
             D += 2*dy
 
 def plot_line_high(points, grid):
-    #print(points)
     pt0, pt1 = points[0], points[1]
     dx = pt1.x - pt0.x
     dy = pt1.y - pt0.y
@@ -188,10 +185,7 @@ def circle(grid, center):
     x = 0
     d = 3 - (2 * y)
 
-    print(center)
-
     for (ptx, pty) in mirror_points_8(x, y):
-        print((center[0]+ptx)%len(grid[0]), (center[1]+pty)%len(grid))
         grid[(center[0]+ptx) % len(grid[0])][(center[1]+pty) % len(grid)].on = True
 
     while (x < y):
@@ -205,7 +199,7 @@ def circle(grid, center):
             d += 4 * x + 6
 
         for (ptx, pty) in mirror_points_8(x, y):
-            grid[center[0]+ptx][center[1]+pty].on = True
+            grid[(center[0]+ptx) % len(grid[0])][(center[1]+pty) % len(grid)].on = True
 
 if __name__ == '__main__':
     main()
