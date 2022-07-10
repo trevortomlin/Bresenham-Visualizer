@@ -1,6 +1,7 @@
 # Base grid code from:
 # https://stackoverflow.com/questions/33963361/how-to-make-a-grid-in-pygame
 
+import random
 import sys
 import pygame
 from dataclasses import dataclass
@@ -10,7 +11,7 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 WINDOW_HEIGHT = 500 + MARGIN
 WINDOW_WIDTH = 500 + MARGIN
-BLOCK_SIZE = 20
+BLOCK_SIZE = 10
 
 @dataclass
 class Point:
@@ -44,7 +45,7 @@ def main():
 
         grid.append(row)
 
-    #print(len(grid), len(grid[0]))
+    print(len(grid), len(grid[0]))
 
     while True:
 
@@ -76,7 +77,13 @@ def main():
 
                     run_algo = True
 
-                        
+                if mouse_presses[2]:
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    
+                    cell_x = mouse_x // BLOCK_SIZE
+                    cell_y = mouse_y // BLOCK_SIZE
+                    
+                    circle(grid, (cell_x, cell_y))
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -163,6 +170,42 @@ def bresenham(points, grid):
             plot_line_high(list(reversed(points)), grid)
         else:
             plot_line_high(points, grid) 
+
+# https://funloop.org/post/2021-03-15-bresenham-circle-drawing-algorithm.html
+def mirror_points_8(x, y):
+    """ Return 8-way symmetry of points. """
+    return [( x,  y),
+            ( y,  x),
+            (-x,  y),
+            (-y,  x),
+            ( x, -y),
+            ( y, -x),
+            (-x, -y),
+            (-y, -x)]
+
+def circle(grid, center):
+    y = random.randint(2, 6)
+    x = 0
+    d = 3 - (2 * y)
+
+    print(center)
+
+    for (ptx, pty) in mirror_points_8(x, y):
+        print((center[0]+ptx)%len(grid[0]), (center[1]+pty)%len(grid))
+        grid[(center[0]+ptx) % len(grid[0])][(center[1]+pty) % len(grid)].on = True
+
+    while (x < y):
+        x+=1
+
+        if d > 0:
+            y -= 1
+            d += 4 * (x - y) + 10
+
+        else:
+            d += 4 * x + 6
+
+        for (ptx, pty) in mirror_points_8(x, y):
+            grid[center[0]+ptx][center[1]+pty].on = True
 
 if __name__ == '__main__':
     main()
